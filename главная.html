@@ -1,0 +1,663 @@
+<script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+          return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+
+                // Convert sheet to JSON to filter blank rows
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                var filteredData = jsonData.filter(row => row.some(filledCell));
+
+                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+                var headerRowIndex = filteredData.findIndex((row, index) =>
+                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                );
+                // Fallback
+                if (headerRowIndex === -1 || headerRowIndex > 25) {
+                  headerRowIndex = 0;
+                }
+
+                // Convert filtered JSON back to CSV
+                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+        }
+        </script><!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VDSok.guru</title>
+    <script src="https://unpkg.com/feather-icons"></script>
+    <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="background-animation">
+        <canvas id="particles-canvas"></canvas>
+    </div>
+
+    <header class="header">
+        <div class="container header-content">
+            <a href="#home" class="logo">VDSok.guru</a>
+            <nav class="navigation">
+                <a href="#home" class="nav-link">Главная</a>
+                <a href="#products" class="nav-link">Продукты</a>
+                <a href="#faq" class="nav-link">FAQ</a>
+                <a href="#contacts" class="nav-link">Контакты</a>
+            </nav>
+            <div class="header-actions">
+                <a href="https://t.me/vdsokguru" class="action-link" target="_blank"><i data-feather="message-circle"></i> Telegram</a>
+                <a href="/login" class="login-button">Вход</a>
+            </div>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <section class="hero-section" id="home">
+            <div id="hero-particles"></div>
+            <div class="container hero-content">
+                <h1 class="hero-title">
+                    Ваша <br>
+                    <span class="highlight-text">Производительность</span> <br>
+                    Наш Приоритет
+                </h1>
+                <p class="hero-description">
+                    Надёжность. Скорость. Качество. <br>
+                    Ваш лучший выбор для хостинга проектов на высокопроизводительных серверах в Москве от профессиональной команды.
+                </p>
+                <a href="#products" class="cta-button">
+                    Ознакомьтесь с нашими услугами
+                    <span class="arrow">→</span>
+                </a>
+            </div>
+        </section>
+
+        <section class="services-section" id="products">
+            <div class="container">
+                <h2 class="section-title">Наши Услуги</h2>
+                <div class="services-tabs">
+                    <button class="tab-button active" data-tab="vds">Виртуальные Серверы</button>
+                    <button class="tab-button" data-tab="domains">Домены</button>
+                </div>
+                <div class="tab-content active" id="vds-tab">
+                    <div class="location-info">
+                        <div class="location-badge">
+                            <i class="location-icon" data-feather="map-pin"></i>
+                            Москва • Дата-центр Tier III • Пинг 5 мс
+                        </div>
+                    </div>
+                    <div class="pricing-grid">
+                        <div class="pricing-card">
+                            <div class="plan-header">
+                                <h3 class="plan-name">RU-1</h3>
+                                <div class="plan-price">430₽<span>/мес</span></div>
+                            </div>
+                            <div class="plan-specs">
+                                <div class="spec-item">
+                                    <i class="spec-icon" data-feather="cpu"></i>
+                                    <span class="spec-text">1 vCPU AMD Ryzen 9 9950X 5.7GHz</span>
+                                </div>
+                                <div class="spec-item">
+                                    <i class="spec-icon" data-feather="memory"></i>
+                                    <span class="spec-text">2 ГБ DDR5</span>
+                                </div>
+                                <div class="spec-item">
+                                    <i class="spec-icon" data-feather="database"></i>
+                                    <span class="spec-text">80 ГБ NVMe SSD</span>
+                                </div>
+                                <div class="spec-item">
+                                    <i class="spec-icon" data-feather="globe"></i>
+                                    <span class="spec-text">до 1 Гбит/с</span>
+                                </div>
+                            </div>
+                            <a href="/order?plan=RU-1" class="order-button">Заказать</a>
+                        </div>
+                        <div class="pricing-card popular">
+                            <div class="popular-badge">Популярный</div>
+                            <div class="plan-header">
+                                <h3 class="plan-name">RU-2</h3>
+                                <div class="plan-price">740₽<span>/мес</span></div>
+                            </div>
+                            <div class="plan-specs">
+                                <div class="spec-item">
+                                    <i class="spec-icon" data-feather="cpu"></i>
+                                    <span class="spec-text">2 vCPU AMD Ryzen 9 9950X 5.7GHz</span>
+                                </div>
+                                <div class="spec-item">
+                                    <i class="spec-icon" data-feather="memory"></i>
+                                    <span class="spec-text">4 ГБ DDR5</span>
+                                </div>
+                                <div class="spec-item">
+                                    <i class="spec-icon" data-feather="database"></i>
+                                    <span class="spec-text">120 ГБ NVMe SSD</span>
+                                </div>
+                                <div class="spec-item">
+                                    <i class="spec-icon" data-feather="globe"></i>
+                                    <span class="spec-text">до 1 Гбит/с</span>
+                                </div>
+                            </div>
+                            <a href="/order?plan=RU-2" class="order-button">Заказать</a>
+                        </div>
+                        <div class="pricing-card">
+                            <div class="plan-header">
+                                <h3 class="plan-name">RU-3</h3>
+                                <div class="plan-price">1,220₽<span>/мес</span></div>
+                            </div>
+                            <div class="plan-specs">
+                                <div class="spec-item">
+                                    <i class="spec-icon" data-feather="cpu"></i>
+                                    <span class="spec-text">4 vCPU AMD Ryzen 9 9950X 5.7GHz</span>
+                                </div>
+                                <div class="spec-item">
+                                    <i class="spec-icon" data-feather="memory"></i>
+                                    <span class="spec-text">8 ГБ DDR5</span>
+                                </div>
+                                <div class="spec-item">
+                                    <i class="spec-icon" data-feather="database"></i>
+                                    <span class="spec-text">150 ГБ NVMe SSD</span>
+                                </div>
+                                <div class="spec-item">
+                                    <i class="spec-icon" data-feather="globe"></i>
+                                    <span class="spec-text">до 1 Гбит/с</span>
+                                </div>
+                            </div>
+                            <a href="/order?plan=RU-3" class="order-button">Заказать</a>
+                        </div>
+                        <div class="pricing-card">
+                            <div class="plan-header">
+                                <h3 class="plan-name">RU-4</h3>
+                                <div class="plan-price">1,980₽<span>/мес</span></div>
+                            </div>
+                            <div class="plan-specs">
+                                <div class="spec-item">
+                                    <i class="spec-icon" data-feather="cpu"></i>
+                                    <span class="spec-text">6 vCPU AMD Ryzen 9 9950X 5.7GHz</span>
+                                </div>
+                                <div class="spec-item">
+                                    <i class="spec-icon" data-feather="memory"></i>
+                                    <span class="spec-text">16 ГБ DDR5</span>
+                                </div>
+                                <div class="spec-item">
+                                    <i class="spec-icon" data-feather="database"></i>
+                                    <span class="spec-text">200 ГБ NVMe SSD</span>
+                                </div>
+                                <div class="spec-item">
+                                    <i class="spec-icon" data-feather="globe"></i>
+                                    <span class="spec-text">до 1 Гбит/с</span>
+                                </div>
+                            </div>
+                            <a href="/order?plan=RU-4" class="order-button">Заказать</a>
+                        </div>
+                        <div class="pricing-card">
+                            <div class="plan-header">
+                                <h3 class="plan-name">RU-5</h3>
+                                <div class="plan-price">2,730₽<span>/мес</span></div>
+                            </div>
+                            <div class="plan-specs">
+                                <div class="spec-item">
+                                    <i class="spec-icon" data-feather="cpu"></i>
+                                    <span class="spec-text">8 vCPU AMD Ryzen 9 9950X 5.7GHz</span>
+                                </div>
+                                <div class="spec-item">
+                                    <i class="spec-icon" data-feather="memory"></i>
+                                    <span class="spec-text">24 ГБ DDR5</span>
+                                </div>
+                                <div class="spec-item">
+                                    <i class="spec-icon" data-feather="database"></i>
+                                    <span class="spec-text">250 ГБ NVMe SSD</span>
+                                </div>
+                                <div class="spec-item">
+                                    <i class="spec-icon" data-feather="globe"></i>
+                                    <span class="spec-text">до 1 Гбит/с</span>
+                                </div>
+                            </div>
+                            <a href="/order?plan=RU-5" class="order-button">Заказать</a>
+                        </div>
+                        <div class="pricing-card">
+                            <div class="plan-header">
+                                <h3 class="plan-name">RU-6</h3>
+                                <div class="plan-price">3,480₽<span>/мес</span></div>
+                            </div>
+                            <div class="plan-specs">
+                                <div class="spec-item">
+                                    <i class="spec-icon" data-feather="cpu"></i>
+                                    <span class="spec-text">10 vCPU AMD Ryzen 9 9950X 5.7GHz</span>
+                                </div>
+                                <div class="spec-item">
+                                    <i class="spec-icon" data-feather="memory"></i>
+                                    <span class="spec-text">32 ГБ DDR5</span>
+                                </div>
+                                <div class="spec-item">
+                                    <i class="spec-icon" data-feather="database"></i>
+                                    <span class="spec-text">300 ГБ NVMe SSD</span>
+                                </div>
+                                <div class="spec-item">
+                                    <i class="spec-icon" data-feather="globe"></i>
+                                    <span class="spec-text">до 1 Гбит/с</span>
+                                </div>
+                            </div>
+                            <a href="/order?plan=RU-6" class="order-button">Заказать</a>
+                        </div>
+                        <div class="pricing-card enterprise">
+                            <div class="enterprise-badge">Корпоративный</div>
+                            <div class="plan-header">
+                                <h3 class="plan-name">RU-7</h3>
+                                <div class="plan-price">5,040₽<span>/мес</span></div>
+                            </div>
+                            <div class="plan-specs">
+                                <div class="spec-item">
+                                    <i class="spec-icon" data-feather="cpu"></i>
+                                    <span class="spec-text">12 vCPU AMD Ryzen 9 9950X 5.7GHz</span>
+                                </div>
+                                <div class="spec-item">
+                                    <i class="spec-icon" data-feather="memory"></i>
+                                    <span class="spec-text">48 ГБ DDR5</span>
+                                </div>
+                                <div class="spec-item">
+                                    <i class="spec-icon" data-feather="database"></i>
+                                    <span class="spec-text">400 ГБ NVMe SSD</span>
+                                </div>
+                                <div class="spec-item">
+                                    <i class="spec-icon" data-feather="globe"></i>
+                                    <span class="spec-text">до 1 Гбит/с</span>
+                                </div>
+                            </div>
+                            <a href="/order?plan=RU-7" class="order-button">Заказать</a>
+                        </div>
+                        <div class="pricing-card">
+                            <div class="plan-header">
+                                <h3 class="plan-name">RU-8</h3>
+                                <div class="plan-price">6,500₽<span>/мес</span></div>
+                            </div>
+                            <div class="plan-specs">
+                                <div class="spec-item">
+                                    <i class="spec-icon" data-feather="cpu"></i>
+                                    <span class="spec-text">16 vCPU AMD Ryzen 9 9950X 5.7GHz</span>
+                                </div>
+                                <div class="spec-item">
+                                    <i class="spec-icon" data-feather="memory"></i>
+                                    <span class="spec-text">48 ГБ DDR5</span>
+                                </div>
+                                <div class="spec-item">
+                                    <i class="spec-icon" data-feather="database"></i>
+                                    <span class="spec-text">500 ГБ NVMe SSD</span>
+                                </div>
+                                <div class="spec-item">
+                                    <i class="spec-icon" data-feather="globe"></i>
+                                    <span class="spec-text">до 1 Гбит/с</span>
+                                </div>
+                            </div>
+                            <a href="/order?plan=RU-8" class="order-button">Заказать</a>
+                        </div>
+                        <div class="pricing-card premium">
+                            <div class="premium-badge">Максимум</div>
+                            <div class="plan-header">
+                                <h3 class="plan-name">RU-9</h3>
+                                <div class="plan-price">9,800₽<span>/мес</span></div>
+                            </div>
+                            <div class="plan-specs">
+                                <div class="spec-item">
+                                    <i class="spec-icon" data-feather="cpu"></i>
+                                    <span class="spec-text">20 vCPU AMD Ryzen 9 9950X 5.7GHz</span>
+                                </div>
+                                <div class="spec-item">
+                                    <i class="spec-icon" data-feather="memory"></i>
+                                    <span class="spec-text">64 ГБ DDR5</span>
+                                </div>
+                                <div class="spec-item">
+                                    <i class="spec-icon" data-feather="database"></i>
+                                    <span class="spec-text">750 ГБ NVMe SSD</span>
+                                </div>
+                                <div class="spec-item">
+                                    <i class="spec-icon" data-feather="globe"></i>
+                                    <span class="spec-text">до 1 Гбит/с</span>
+                                </div>
+                            </div>
+                            <a href="/order?plan=RU-9" class="order-button">Заказать</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="tab-content" id="domains-tab">
+                    <div class="domains-grid">
+                        <div class="domain-card">
+                            <h3>.xyz</h3>
+                            <div class="domain-price">239₽<span>/год</span></div>
+                            <ul class="domain-features">
+                                <li>Быстрая регистрация</li>
+                            </ul>
+                            <a href="/register?domain=xyz" class="order-button">Зарегистрировать</a>
+                        </div>
+                        <div class="domain-card">
+                            <div class="popular-badge">Популярный</div>
+                            <h3>.com</h3>
+                            <div class="domain-price">1069₽<span>/год</span></div>
+                            <ul class="domain-features">
+                                <li>Международная зона</li>
+                                <li>Высокое доверие</li>
+                                <li>Преимущества для SEO</li>
+                            </ul>
+                            <a href="/register?domain=com" class="order-button">Зарегистрировать</a>
+                        </div>
+                        <div class="domain-card">
+                            <h3>.net</h3>
+                            <div class="domain-price">1389₽<span>/год</span></div>
+                            <ul class="domain-features">
+                                <li>Для IT-проектов</li>
+                                <li>Альтернатива .com</li>
+                                <li>Профессиональный вид</li>
+                            </ul>
+                            <a href="/register?domain=net" class="order-button">Зарегистрировать</a>
+                        </div>
+                        <div class="domain-card">
+                            <h3>.org</h3>
+                            <div class="domain-price">979₽<span>/год</span></div>
+                            <ul class="domain-features">
+                                <li>Для организаций</li>
+                                <li>Некоммерческие проекты</li>
+                                <li>Доверие пользователей</li>
+                            </ul>
+                            <a href="/register?domain=org" class="order-button">Зарегистрировать</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="crypto-section">
+            <div class="container">
+                <h2 class="section-title">Способы Оплаты</h2>
+                <p class="crypto-description">Удобные способы оплаты, включая криптовалюты и банковские карты</p>
+                <div class="crypto-grid">
+                    <div class="crypto-card">
+                        <i class="crypto-icon" data-feather="credit-card"></i>
+                        <h3>Банковские карты</h3>
+                        <p>Visa, MasterCard</p>
+                    </div>
+                    <div class="crypto-card">
+                        <i class="crypto-icon" data-feather="currency-bitcoin"></i>
+                        <h3>Bitcoin</h3>
+                        <p>BTC</p>
+                    </div>
+                    <div class="crypto-card">
+                        <i class="crypto-icon" data-feather="dollar-sign"></i>
+                        <h3>Ethereum</h3>
+                        <p>ETH</p>
+                    </div>
+                    <div class="crypto-card">
+                        <i class="crypto-icon" data-feather="dollar-sign"></i>
+                        <h3>Tether</h3>
+                        <p>USDT</p>
+                    </div>
+                    <div class="crypto-card">
+                        <i class="crypto-icon" data-feather="dollar-sign"></i>
+                        <h3>Litecoin</h3>
+                        <p>LTC</p>
+                    </div>
+                    <div class="crypto-card">
+                        <i class="crypto-icon" data-feather="more-horizontal"></i>
+                        <h3>Другие</h3>
+                        <p>По запросу</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="hosting-info-section">
+            <div class="container">
+                <h2 class="section-title">Что такое VDS-хостинг?</h2>
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <i class="feature-icon" data-feather="server"></i>
+                        <h3>Виртуальный сервер</h3>
+                        <p>VDS — это виртуальная машина с гарантированными ресурсами, работающая как физический сервер.</p>
+                    </div>
+                    <div class="feature-card">
+                        <i class="feature-icon" data-feather="settings"></i>
+                        <h3>Полный контроль</h3>
+                        <p>Root-доступ к серверу, установка любого ПО, настройка системы без ограничений.</p>
+                    </div>
+                    <div class="feature-card">
+                        <i class="feature-icon" data-feather="bar-chart-2"></i>
+                        <h3>Масштабируемость</h3>
+                        <p>Легко увеличивайте ресурсы сервера по мере роста проекта. Обновление за минуты.</p>
+                    </div>
+                    <div class="feature-card">
+                        <i class="feature-icon" data-feather="headphones"></i>
+                        <h3>Техническая поддержка</h3>
+                        <p>Наша команда помогает с настройкой, миграцией и решением технических вопросов 24/7.</p>
+                    </div>
+                </div>
+                <div class="network-visualization">
+                    <div class="network-node"></div>
+                    <div class="network-node"></div>
+                    <div class="network-node"></div>
+                </div>
+            </div>
+        </section>
+
+        <section class="advantages-section">
+            <div class="container">
+                <div class="advantages-content">
+                    <div class="advantages-text">
+                        <h2 class="section-title">Преимущества нашего VDS</h2>
+                        <div class="advantage-item">
+                            <i class="advantage-icon" data-feather="zap"></i>
+                            <div class="advantage-content">
+                                <h4>Высокая производительность</h4>
+                                <p>Новейшие процессоры AMD Ryzen 9 9950X до 5.7 ГГц обеспечивают максимальную скорость приложений.</p>
+                            </div>
+                        </div>
+                        <div class="advantage-item">
+                            <i class="advantage-icon" data-feather="database"></i>
+                            <div class="advantage-content">
+                                <h4>Быстрые NVMe-диски</h4>
+                                <p>Скорость чтения/записи до 3500 МБ/с. Ваши сайты и приложения загружаются мгновенно.</p>
+                            </div>
+                        </div>
+                        <div class="advantage-item">
+                            <i class="advantage-icon" data-feather="globe"></i>
+                            <div class="advantage-content">
+                                <h4>Высокоскоростной интернет</h4>
+                                <p>Канал до 1 Гбит/с для всех тарифов. Подключение к крупнейшим интернет-узлам России.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="advantages-image">
+                        <div class="server-visualization">
+                            <div class="server-rack">
+                                <div class="server-unit"></div>
+                                <div class="server-unit"></div>
+                                <div class="server-unit"></div>
+                                <div class="server-unit"></div>
+                                <div class="server-unit"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="use-cases-section">
+            <div class="container">
+                <h2 class="section-title">Сценарии использования VDS</h2>
+                <div class="use-cases-grid">
+                    <div class="use-case-card">
+                        <i class="use-case-icon" data-feather="globe"></i>
+                        <h3>Сайты и интернет-магазины</h3>
+                        <p>Хостинг WordPress, Joomla, OpenCart, Bitrix и других CMS с высокой производительностью.</p>
+                    </div>
+                    <div class="use-case-card">
+                        <i class="use-case-icon" data-feather="phone"></i>
+                        <h3>Мобильные приложения</h3>
+                        <p>Бэкенд для мобильных приложений, серверы API и системы push-уведомлений.</p>
+                    </div>
+                    <div class="use-case-card">
+                        <i class="use-case-icon" data-feather="play"></i>
+                        <h3>Игровые серверы</h3>
+                        <p>Minecraft, CS:GO, Rust и другие игровые серверы с низким пингом и стабильной работой.</p>
+                    </div>
+                    <div class="use-case-card">
+                        <i class="use-case-icon" data-feather="users"></i>
+                        <h3>Корпоративные решения</h3>
+                        <p>CRM-системы, корпоративная почта, файловое хранилище и системы видеоконференций.</p>
+                    </div>
+                    <div class="use-case-card">
+                        <i class="use-case-icon" data-feather="code"></i>
+                        <h3>Разработка и тестирование</h3>
+                        <p>Среды разработки, CI/CD-пайплайны и тестовые стенды для ваших проектов.</p>
+                    </div>
+                    <div class="use-case-card">
+                        <i class="use-case-icon" data-feather="bar-chart-2"></i>
+                        <h3>Аналитика и большие данные</h3>
+                        <p>Обработка больших данных, машинное обучение и системы аналитики/мониторинга.</p>
+                    </div>
+                </div>
+                <div class="data-flow-visualization">
+                    <div class="data-node"></div>
+                    <div class="data-node"></div>
+                    <div class="data-node"></div>
+                </div>
+            </div>
+        </section>
+
+        <section class="features-section">
+            <div class="container">
+                <h2 class="section-title">Почему выбирают нас</h2>
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <i class="feature-icon" data-feather="zap"></i>
+                        <h3>Высокая производительность</h3>
+                        <p>Мощное оборудование для максимальной скорости.</p>
+                    </div>
+                    <div class="feature-card">
+                        <i class="feature-icon" data-feather="cpu"></i>
+                        <h3>AMD Ryzen 9</h3>
+                        <p>Новейшие процессоры до 5.7 ГГц.</p>
+                    </div>
+                    <div class="feature-card">
+                        <i class="feature-icon" data-feather="database"></i>
+                        <h3>NVMe SSD</h3>
+                        <p>Сверхбыстрые накопители.</p>
+                    </div>
+                    <div class="feature-card">
+                        <i class="feature-icon" data-feather="globe"></i>
+                        <h3>1 Гбит/с</h3>
+                        <p>Высокоскоростное соединение для всех тарифов.</p>
+                    </div>
+                    <div class="feature-card">
+                        <i class="feature-icon" data-feather="shield"></i>
+                        <h3>Защита от DDoS</h3>
+                        <p>Профессиональная защита.</p>
+                    </div>
+                    <div class="feature-card">
+                        <i class="feature-icon" data-feather="headphones"></i>
+                        <h3>Поддержка 24/7</h3>
+                        <p>Круглосуточная техническая помощь.</p>
+                    </div>
+                </div>
+                <div class="cpu-visualization">
+                    <div class="cpu-bar"></div>
+                    <div class="cpu-bar"></div>
+                    <div class="cpu-bar"></div>
+                    <div class="cpu-bar"></div>
+                </div>
+            </div>
+        </section>
+
+        <section class="faq-section" id="faq">
+            <div class="container">
+                <h2 class="section-title">Часто задаваемые вопросы</h2>
+                <div class="faq-content">
+                    <div class="faq-item">
+                        <h3>Что такое VDS?</h3>
+                        <p>Виртуальный выделенный сервер (VDS) предоставляет выделенные ресурсы на виртуальной машине, обеспечивая полный контроль, как на физическом сервере.</p>
+                    </div>
+                    <div class="faq-item">
+                        <h3>Как быстро происходит настройка?</h3>
+                        <p>Ваш VDS будет настроен в течение нескольких минут после подтверждения оплаты.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="contacts-section" id="contacts">
+            <div class="container">
+                <h2 class="section-title">Свяжитесь с нами</h2>
+                <div class="contacts-content">
+                    <p>Email: <a href="mailto:support@vdsok.guru">support@vdsok.guru</a></p>
+                    <p>Telegram: <a href="https://t.me/vdsokguru" target="_blank">@vdsokguru</a></p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container footer-content">
+            <div class="footer-section">
+                <a href="#home" class="footer-logo">VDSok.guru</a>
+                <p class="footer-description">
+                    Высокопроизводительные виртуальные серверы в Москве. Надёжные, быстрые и с профессиональной поддержкой для ваших проектов.
+                </p>
+                <div class="footer-social">
+                    <a href="https://t.me/vdsokguru" class="social-link" target="_blank">Telegram</a>
+                    <a href="mailto:support@vdsok.guru" class="social-link">support@vdsok.guru</a>
+                </div>
+            </div>
+            <div class="footer-section">
+                <h4>Услуги</h4>
+                <ul class="footer-links">
+                    <li><a href="/services/vds">Виртуальные серверы</a></li>
+                    <li><a href="/services/domains">Регистрация доменов</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Поддержка</h4>
+                <ul class="footer-links">
+                    <li><a href="#faq">FAQ</a></li>
+                    <li><a href="/support/docs">Документация</a></li>
+                    <li><a href="/support/status">Статус сервисов</a></li>
+                    <li><a href="#contacts">Контакты</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Юридическая информация</h4>
+                <ul class="footer-links">
+                    <li><a href="/legal/terms">Условия предоставления услуг</a></li>
+                    <li><a href="/legal/privacy">Политика конфиденциальности</a></li>
+                    <li><a href="/legal/offer">Публичная оферта</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="container footer-bottom">
+            <div class="footer-info">
+                <p>© 2025 VDSok.guru. Все права защищены.</p>
+            </div>
+            <div class="footer-payment">
+                <span>Мы принимаем:</span>
+                <div class="payment-icons">
+                    <i data-feather="credit-card"></i>
+                    <i data-feather="currency-bitcoin"></i>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
